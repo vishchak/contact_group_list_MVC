@@ -24,6 +24,11 @@ public class GroupDAOImpl implements GroupDAO {
     }
 
     @Override
+    public void delete(Long id) {
+        entityManager.remove(entityManager.getReference(Group.class, id));
+    }
+
+    @Override
     public Group findOne(long id) {
         return entityManager.getReference(Group.class, id);
     }
