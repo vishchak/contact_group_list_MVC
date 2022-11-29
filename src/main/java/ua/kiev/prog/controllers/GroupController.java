@@ -29,9 +29,17 @@ public class GroupController {
         return "group_add_page";
     }
 
-    @RequestMapping(value="/group/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/group/add", method = RequestMethod.POST)
     public String groupAdd(@RequestParam String name) {
         contactService.addGroup(new Group(name));
+        return "redirect:/";
+    }
+
+    @RequestMapping("/group/delete/{id}")
+    public String deleteGroup(@PathVariable(value = "id") long groupId) {
+        if (groupId != DEFAULT_GROUP_ID) {
+            contactService.deleteGroup(groupId);
+        }
         return "redirect:/";
     }
 
