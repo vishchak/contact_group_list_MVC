@@ -1,6 +1,6 @@
 package ua.kiev.prog.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ua.kiev.prog.model.Contact;
 import ua.kiev.prog.model.Group;
 import ua.kiev.prog.services.ContactService;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
 
 import static ua.kiev.prog.controllers.GroupController.DEFAULT_GROUP_ID;
 
@@ -57,14 +62,14 @@ public class ContactController {
     @RequestMapping(value = "/contact/delete", method = RequestMethod.POST)
     public ResponseEntity<Void> delete(
             @RequestParam(value = "toDelete[]", required = false)
-                    long[] toDelete) {
+            long[] toDelete) {
         if (toDelete != null && toDelete.length > 0)
             contactService.deleteContact(toDelete);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value="/contact/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/contact/add", method = RequestMethod.POST)
     public String contactAdd(@RequestParam(value = "group") long groupId,
                              @RequestParam String name,
                              @RequestParam String surname,
@@ -76,6 +81,32 @@ public class ContactController {
         Contact contact = new Contact(group, name, surname, phone, email);
         contactService.addContact(contact);
 
+        return "redirect:/";
+    }
+
+    @RequestMapping(value = "/download", method = RequestMethod.GET)
+    public String downloadData(HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/octet-stream");
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=Contacts.json";
+
+        List<Group> groups = contactService.listGroups();
+        StringBuilder sb = new StringBuilder();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        for (Group g :
+                groups) {
+            sb.append(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(g));
+        }
+
+        ServletOutputStream os = resp.getOutputStream();
+        try {
+            resp.setHeader(headerKey, headerValue);
+            os.write(sb.toString().getBytes());
+            os.close();
+        } finally {
+            os.close();
+        }
         return "redirect:/";
     }
 }

@@ -1,5 +1,7 @@
 package ua.kiev.prog.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +13,8 @@ public class Group {
     @GeneratedValue
     private Long id;
     private String name;
-
-    @OneToMany(mappedBy="group", cascade=CascadeType.ALL)
+    @JsonManagedReference
+    @OneToMany(mappedBy="group", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Contact> contacts = new ArrayList<>();
 
     public Group() {}
@@ -44,4 +46,5 @@ public class Group {
     public void setContacts(List<Contact> contacts) {
         this.contacts = contacts;
     }
+
 }
