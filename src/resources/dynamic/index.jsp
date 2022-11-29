@@ -29,6 +29,14 @@
                                     </c:forEach>
                                 </ul>
                             </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Delete group <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <c:forEach items="${groups}" var="group">
+                                        <li><a href="/group/delete/${group.id}">${group.name}</a></li>
+                                    </c:forEach>
+                                </ul>
+                            </li>
                         </ul>
                         <form class="navbar-form navbar-left" role="search" action="/search" method="post">
                             <div class="form-group">
